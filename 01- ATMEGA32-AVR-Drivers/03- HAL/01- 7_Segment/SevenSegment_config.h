@@ -19,9 +19,12 @@
 #define     SEVEN_SEGMENT_PIN0           PIN_0
 #define     SEVEN_SEGMENT_PIN1           PIN_1
 #define     SEVEN_SEGMENT_PIN2           PIN_2
-#define     SEVEN_SEGMENT_PIN3           PIN_3
+#define     SEVEN_SEGMENT_PIN3           PIN_4
 
 
-#define     SEVEN_SEGMENT_ANODE	         PORT_A,PIN_3,LOW
+#define     SEVEN_SEGMENT_ANODE_1	         PORT_A,PIN_3
+#define     SEVEN_SEGMENT_ANODE_2	         PORT_A,PIN_2
+#define     SEVEN_SEGMENT_ANODE_3	         PORT_B,PIN_5
+#define     SEVEN_SEGMENT_ANODE_4	         PORT_B,PIN_6
 
 #endif
