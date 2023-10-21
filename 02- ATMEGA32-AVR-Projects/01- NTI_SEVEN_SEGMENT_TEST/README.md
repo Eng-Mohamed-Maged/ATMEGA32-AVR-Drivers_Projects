@@ -1,4 +1,4 @@
-# ATMEGA32_AVR-DIO-SEVEN-SEGMENT Testing
+# ATMEGA32-AVR-DIO-SEVEN-SEGMENT Testing
 Testing DIO Driver by using 4 SEVEN-SEGMENT
 
 # Table of Contents
@@ -12,15 +12,15 @@ The ATMEGA32_AVR microcontroller is widely used microcontroller in embedded syst
 
 # Testing Video
 
-[![IMAGE ALT TEXT HERE](https://github.com/Eng-Mohamed-Maged/STM32F10x-ARM-Drivers-Projects/blob/main/02-%20STM32F10x-ARM-Projects/01-%20Test_GPIO_DRIVER/1.png)](https://youtu.be/Jk6IEbAS3nk)
+[![IMAGE ALT TEXT HERE](https://github.com/Eng-Mohamed-Maged/ATMEGA32-AVR-Drivers_Projects/blob/main/02-%20ATMEGA32-AVR-Projects/01-%20NTI_SEVEN_SEGMENT_TEST/0.png)](https://www.youtube.com/watch?v=u1u-5DiaP0o)
 
 # Getting Started
-To get started with using these drivers in your STM32F10x-ARM project, follow these steps:
+To get started with using these drivers in your ATMEGA32-AVR project, follow these steps:
 1. Clone or download this repository to your development environment.
 2. Copy the required driver files from the repository to your project directory.
 3. Include the necessary driver header files in your source code.
 4. Configure the microcontroller's peripherals and initialize the drivers as needed.
-5. Build and flash your project onto the STM32F10x-ARM microcontroller.
+5. Build and flash your project onto the ATMEGA32-AVR microcontroller.
 
 
 <h3 align="left">Connect with me:</h3>
