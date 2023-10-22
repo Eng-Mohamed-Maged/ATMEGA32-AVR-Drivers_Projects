@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 21 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 22 October 2023                                               */
 /*   Logs      : V01 : Initial Creation                                        */
+/*               V02 : Bug Fixed !                                             */
 /*******************************************************************************/
 #include "../inc/STD_TYPES.h"
 #include "../inc/BIT_MATH.h"
@@ -35,6 +36,11 @@ void KeyPad_Init(void)
 		DIO_voidSetPinDirection(KeyPad_PIN_R2,INPUT);
 		DIO_voidSetPinDirection(KeyPad_PIN_R1,INPUT);
 
+		DIO_voidSetPinValue(KeyPad_PIN_R4,HIGH);
+		DIO_voidSetPinValue(KeyPad_PIN_R3,HIGH);
+		DIO_voidSetPinValue(KeyPad_PIN_R2,HIGH);
+		DIO_voidSetPinValue(KeyPad_PIN_R1,HIGH);
+
 		/* Set Cols as Output */
 		DIO_voidSetPinDirection(KeyPad_PIN_C1,OUTPUT);
 		DIO_voidSetPinDirection(KeyPad_PIN_C2,OUTPUT);
@@ -65,7 +71,7 @@ u8 KeyPad_u8GetKey(void)
 			{
 				/* Key is pressed */
 				Localu8PressedKey = (Row*4 + Col)/2;
-//				while(DIO_voidGetPinValue(Row_Arr[Row],Row_Arr[Row+1]) == 0);
+				while(DIO_voidGetPinValue(Row_Arr[Row],Row_Arr[Row+1]) == 0);
 				return Localu8PressedKey ;// or break;
 			}
 			else
