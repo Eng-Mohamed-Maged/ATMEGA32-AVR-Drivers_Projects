@@ -1,5 +1,5 @@
-# ATMEGA32-AVR KEYPAD DRIVER Testing
-Testing KEYPAD Driver by using SEVEN-SEGMENT
+# ATMEGA32-AVR-DIO-SEVEN-SEGMENT Testing
+Testing DIO Driver by using 4 SEVEN-SEGMENT
 
 # Table of Contents
 - Introduction
@@ -12,7 +12,7 @@ The ATMEGA32_AVR microcontroller is widely used microcontroller in embedded syst
 
 # Testing Video
 
-[![IMAGE ALT TEXT HERE](https://github.com/Eng-Mohamed-Maged/ATMEGA32-AVR-Drivers_Projects/blob/main/02-%20ATMEGA32-AVR-Projects/01-%20NTI_SEVEN_SEGMENT_TEST/0.png)](https://www.youtube.com/watch?v=dCvei6NWwYg)
+[![IMAGE ALT TEXT HERE](https://github.com/Eng-Mohamed-Maged/ATMEGA32-AVR-Drivers_Projects/blob/main/02-%20ATMEGA32-AVR-Projects/01-%20NTI_SEVEN_SEGMENT_TEST/0.png)](https://www.youtube.com/watch?v=u1u-5DiaP0o)
 
 # Getting Started
 To get started with using these drivers in your ATMEGA32-AVR project, follow these steps:
