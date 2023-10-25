@@ -1,9 +1,8 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V02                                                           */
-/*   Date      : 22 October 2023                                               */
+/*   Version   : V01                                                           */
+/*   Date      : 21 October 2023                                               */
 /*   Logs      : V01 : Initial Creation                                        */
-/*               V02 : Bug Fixed !                                             */
 /*******************************************************************************/
 #include "../inc/STD_TYPES.h"
 #include "../inc/BIT_MATH.h"
@@ -59,7 +58,7 @@ void KeyPad_Init(void)
 
 u8 KeyPad_u8GetKey(void)
 {
-	volatile u8 Localu8PressedKey;
+	volatile static u8 Localu8PressedKey = 0;
 	u8 Col,Row;
 	for(Col=0;Col<8;Col+=2)
 	{
