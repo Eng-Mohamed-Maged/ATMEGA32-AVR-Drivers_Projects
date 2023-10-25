@@ -22,14 +22,11 @@ int main()
 	KeyPad_Init();
 
 	u16 SevenSegment_Number = 0;
+
 	while(1)
 	{
 		SevenSegment_Number = KeyPad_u8GetKey();
-		for(u16 i = 0 ;i < 150; i++)
-		{
-//			SevenSegment_voidDisplay_ALL(SevenSegment_Number);
-			SevenSegment_voidDisplay(SevenSegment_Number,0);
-		}
+		SevenSegment_voidDisplay_ALL(SevenSegment_Number);
 	}
 	return 0;
 }

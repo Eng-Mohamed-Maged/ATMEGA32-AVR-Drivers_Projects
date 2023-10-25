@@ -58,7 +58,7 @@ void KeyPad_Init(void)
 
 u8 KeyPad_u8GetKey(void)
 {
-	volatile u8 Localu8PressedKey;
+	volatile static u8 Localu8PressedKey = 0;
 	u8 Col,Row;
 	for(Col=0;Col<8;Col+=2)
 	{
