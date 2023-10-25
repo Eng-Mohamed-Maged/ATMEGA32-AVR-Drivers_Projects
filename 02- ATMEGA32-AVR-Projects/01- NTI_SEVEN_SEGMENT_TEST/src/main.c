@@ -22,11 +22,7 @@ int main()
 
 	while(1)
 	{
-		for(u16 i = 0 ;i < 150; i++)
-		{
-			SevenSegment_voidDisplay_ALL(SevenSegment_Number);
-		}
-		SevenSegment_Number++;
+		SevenSegment_voidDisplay_ALL(SevenSegment_Number++);
 		if(SevenSegment_Number == 9999)
 		{
 			SevenSegment_Number = 0;
