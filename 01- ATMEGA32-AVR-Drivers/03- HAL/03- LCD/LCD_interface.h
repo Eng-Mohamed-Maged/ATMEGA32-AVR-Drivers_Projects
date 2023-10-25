@@ -18,5 +18,6 @@ void H_LCD_void_creatCustomChar(const u8 * ArrPattern,u8 copy_u8charCode);
 void H_LCD_void_displayCustomChar(u8 copy_u8charCode);
 void H_LCD_void_ShiftString(const s8 *pstr,u8 copy_u8lineNumber);
 void H_LCD_void_clearLine(u8 copy_u8lineNumber);
+void H_LCD_void_sendFloat(f32 number, u8 decimalPlaces);
 
 #endif

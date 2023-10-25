@@ -109,6 +109,14 @@ void H_LCD_void_Init(void)
 		H_LCD_void_sendCommand(0b00000110);
 
 
+/*
+		H_LCD_void_sendCommand(0X02);
+		H_LCD_void_sendCommand(0X28);
+		H_LCD_void_sendCommand(0X0c);
+		H_LCD_void_sendCommand(0X01);
+		_delay_ms(1);
+		H_LCD_void_sendCommand(0X06);
+*/
 	#endif
 	
  }
@@ -267,6 +275,40 @@ void H_LCD_void_displayCustomChar(u8 copy_u8charCode)
     // Send the custom character using its character code (0 to 7)
     H_LCD_void_sendData(copy_u8charCode);
 }
+
+
+void H_LCD_void_sendFloat(f32 number, u8 decimalPlaces)
+{
+    // Handle negative numbers
+    if (number < 0.0)
+    {
+        H_LCD_void_sendData('-');
+        number = -number;
+    }
+
+    // Extract the integer part
+    u32 integerPart = (u32)number;
+
+    // Convert the integer part to a string
+    H_LCD_void_sendIntNum(integerPart);
+
+    // Handle decimal point
+    if (decimalPlaces > 0)
+    {
+        H_LCD_void_sendData('.');
+        number -= (f32)integerPart; // Get the fractional part
+
+        // Print decimal digits
+        for (u8 i = 0; i < decimalPlaces; i++)
+        {
+            number *= 10.0;
+            u8 digit = (u8)number;
+            H_LCD_void_sendData('0' + digit);
+            number -= (f32)digit;
+        }
+    }
+}
+
 
 
 
