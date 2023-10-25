@@ -2,17 +2,17 @@
 Testing [ADC] Driver by using LDR Sensor with LCD
 
 # Table of Contents
-- Introduction
-- Testing Video
-- Getting Started
-- Connect with me
+- [Introduction](#Introduction)
+- [Testing Video](#Testing-Video)
+- [Getting Started](#Getting-Started)
+- [Connect with me](#Connect-with-me)
 
 # Introduction
 The ATMEGA32_AVR microcontroller is widely used microcontroller in embedded systems development. This repository aims to provide a collection of custom drivers written in C for this microcontroller, making it easier to develop applications and interact with various peripherals.
 
 # Testing Video
 
-[![IMAGE ALT TEXT HERE]()](https://www.youtube.com/watch?v=GkOoxkhhmic)
+[![IMAGE ALT TEXT HERE](https://github.com/Eng-Mohamed-Maged/ATMEGA32-AVR-Drivers_Projects/blob/main/02-%20ATMEGA32-AVR-Projects/04-%20NTI_ADC_AVR_TEST/0.png)](https://www.youtube.com/watch?v=GkOoxkhhmic)
 
 # Getting Started
 To get started with using these drivers in your ATMEGA32-AVR project, follow these steps:
