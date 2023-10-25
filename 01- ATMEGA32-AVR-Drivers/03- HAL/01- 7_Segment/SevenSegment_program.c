@@ -1,7 +1,7 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
 /*   Version   : V01                                                           */
-/*   Date      : 21 October 2023                                               */
+/*   Date      : 29 Srptember 2023                                             */
 /*   Logs      : V01 : Initial Creation                                        */
 /*******************************************************************************/
 
@@ -37,6 +37,8 @@ void SevenSegment_Init(void)
 
 void SevenSegment_voidDisplay_ALL(u16 Copy_u16Value)
 {
+	for(u16 i = 0 ;i < 100; i++)
+	{
 	DIO_voidSetPinValue(SEVEN_SEGMENT_ANODE_1,HIGH);
 	DIO_voidSetPinValue(SEVEN_SEGMENT_ANODE_2,HIGH);
 	DIO_voidSetPinValue(SEVEN_SEGMENT_ANODE_3,HIGH);
@@ -58,7 +60,7 @@ void SevenSegment_voidDisplay_ALL(u16 Copy_u16Value)
 	SevenSegment_voidDisplay(Digit4,0);
 	_delay_ms(1);
 
-
+	}
 }
 
 
