@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 24 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 26 October 2023                                               */
 /*   Logs      : V01 : Initial Creation                                        */
+/*               V02 : Adding Trigger Mode and Get ADC_Data Function           */
 /*******************************************************************************/
 #ifndef  ADC_INTERFACE_H
 #define  ADC_INTERFACE_H
@@ -51,7 +52,22 @@ typedef enum
 	ADC_AUTO_TRIGGER_OFF = 0,
 	ADC_AUTO_TRIGGER_ON
 }ADC_TRIGGER_t;
-	
+
+/* Enum for ADC AUTO TRIGGER MODES  */
+typedef enum
+{
+	ADC_FREE_RUNNING    = 0	   	,
+	ADC_ANALOG_COMPARATOR      	,
+	ADC_EXTI0   			   	,
+	ADC_TIMER0_COMPARE_MATCH   	,
+	ADC_TIMER0_OVERFLOW   		,
+	ADC_TIMER1_COMPARE_MATCH_B  ,
+	ADC_TIMER1_OVERFLOW   		,
+	ADC_TIMER1_CAPTURE_EVENT
+}ADC_TRIG_MOD_t;
+
+
+
 /* Enum for ADC PRE-SCALER  */
 typedef enum
 {
@@ -69,9 +85,16 @@ typedef enum
 /****************  Functions Decleration  ******************/
 
 
-void MADC_Init(ADC_VREF_t Copy_ADC_VREF, ADC_ADJUST_t Copy_ADC_Adjust,ADC_TRIGGER_t Copy_ADC_Trigger,ADC_PRESCALER_t Copy_ADC_Prescaler );
+void MADC_Init(ADC_VREF_t Copy_ADC_VREF          	,
+			   ADC_ADJUST_t Copy_ADC_Adjust		 	,
+			   ADC_PRESCALER_t Copy_ADC_Prescaler	,
+			   ADC_TRIGGER_t Copy_ADC_Trigger    	,
+			   ADC_TRIG_MOD_t Copy_ADC_Trigger_Mode
+			   );
 
 void MADC_getDigitalValueSynchNonBlocking (ADC_CHANNELS_t Copy_ADC_Channel,u16 * ADC_GET_Data);
+
+u16 MADC_getDigitalValue(void);
 
 
 

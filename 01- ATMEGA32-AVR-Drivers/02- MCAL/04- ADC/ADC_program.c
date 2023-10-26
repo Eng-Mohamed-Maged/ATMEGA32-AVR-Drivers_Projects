@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 24 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 26 October 2023                                               */
 /*   Logs      : V01 : Initial Creation                                        */
+/*               V02 : Adding Trigger Mode and Get ADC_Data Function           */
 /*******************************************************************************/
 
 #include  "../inc/STD_TYPES.h"
@@ -17,7 +18,12 @@ void (* ADC_CallBack)(void) = '\0';
 /****************  Functions Decleration  ******************/
 
 
-void MADC_Init(ADC_VREF_t Copy_ADC_VREF, ADC_ADJUST_t Copy_ADC_Adjust,ADC_TRIGGER_t Copy_ADC_Trigger,ADC_PRESCALER_t Copy_ADC_Prescaler )
+void MADC_Init(ADC_VREF_t Copy_ADC_VREF          	,
+			   ADC_ADJUST_t Copy_ADC_Adjust		 	,
+			   ADC_PRESCALER_t Copy_ADC_Prescaler	,
+			   ADC_TRIGGER_t Copy_ADC_Trigger    	,
+			   ADC_TRIG_MOD_t Copy_ADC_Trigger_Mode
+			   )
 {
 	/******* FOR ADJUST *********/
 	if (Copy_ADC_Adjust == ADC_LEFT_ADJUST)
@@ -40,12 +46,19 @@ void MADC_Init(ADC_VREF_t Copy_ADC_VREF, ADC_ADJUST_t Copy_ADC_Adjust,ADC_TRIGGE
 	if (Copy_ADC_Trigger == ADC_AUTO_TRIGGER_ON)
 	{
 		SET_BIT(ADC->ADCSRA ,ADATE_BIT);
+
+		/******* FOR TRIGGER MODE *********/
+		/* Bit Masking */
+		ADC->SFIOR &= 0b00011111;
+		/* Assign TRIGGER MODE Value */
+		ADC->SFIOR |= (Copy_ADC_Trigger_Mode << 5);
+
 	}
 	else if(Copy_ADC_Trigger == ADC_AUTO_TRIGGER_OFF)
 	{
 		CLR_BIT(ADC->ADCSRA ,ADATE_BIT);
 	}
-	
+
 	/******* FOR PRESCALER *********/
 	/* Bit Masking */
 	ADC->ADCSRA &= 0b11111000;
@@ -60,7 +73,6 @@ void MADC_Init(ADC_VREF_t Copy_ADC_VREF, ADC_ADJUST_t Copy_ADC_Adjust,ADC_TRIGGE
 
 void MADC_getDigitalValueSynchNonBlocking (ADC_CHANNELS_t Copy_ADC_Channel,u16 * ADC_GET_Data)
 {	
-	u8 TempADC_Data = 0;
 	/* Bit Masking */
 	ADC->ADMUX &= 0b11100000;
 	/* Assign Channel Value */
@@ -69,8 +81,7 @@ void MADC_getDigitalValueSynchNonBlocking (ADC_CHANNELS_t Copy_ADC_Channel,u16 *
 	/**** The conversion is complete ****/
 	if(GET_BIT(ADC->ADCSRA ,ADSC_BIT) == 0)
 	{
-		TempADC_Data = ADC->ADCL;
-		*ADC_GET_Data = TempADC_Data|((ADC->ADCH)<<8);
+		*ADC_GET_Data = MADC_getDigitalValue();
 	}
 
 	/* Start Conversion */
@@ -78,7 +89,12 @@ void MADC_getDigitalValueSynchNonBlocking (ADC_CHANNELS_t Copy_ADC_Channel,u16 *
 
 }
 
-
+u16 MADC_getDigitalValue(void)
+{
+	u8 TempADC_Data = 0;
+	TempADC_Data = ADC->ADCL;
+	return (TempADC_Data|((ADC->ADCH)<<8));
+}
 
 /************  CallBack Functions Declerations  *************/
 

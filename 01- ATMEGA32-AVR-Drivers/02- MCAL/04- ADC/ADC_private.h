@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 24 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 26 October 2023                                               */
 /*   Logs      : V01 : Initial Creation                                        */
+/*               V02 : Adding Trigger Mode and Get ADC_Data Function           */
 /*******************************************************************************/
 
 #ifndef  ADC_PRIVATE_H
