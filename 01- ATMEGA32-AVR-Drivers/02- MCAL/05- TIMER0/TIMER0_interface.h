@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 26 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 29 October 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
+/*               V02 : Fix Errors in Calculations for Delay                    */
 /*******************************************************************************/
 #ifndef TIMER0_INTERFACE_H
 #define	TIMER0_INTERFACE_H
@@ -12,24 +13,19 @@ typedef enum{
 	TIME_MS ,
 	TIME_US
 }TIMER0_TIME_t;
-
-
+/*************************************************************************************************************/
 typedef enum{
 	TIMER0_OUTPUT_COMPARE_MATCH_INTERRUPT  ,
 	TIMER0_OVERFLOW_INTERRUPT 
 }TIMER0_INT_t;
-
-
+/*************************************************************************************************************/
 typedef enum{
 	TIMER0_BUSY_WAIT_FUNCTION  			,
 	TIMER0_PERIODIC_INTERRUPT_FUNCTION  ,
 	TIMER0_NO_OPERATION
 }TIMER0_GLOBAL_t;
 
-
-
-
-
+/****************************************************************************/
 void M_TIMER0_voidInit(void);
 void M_TIMER0_voidStart(void);
 void M_TIMER0_voidStop(void);

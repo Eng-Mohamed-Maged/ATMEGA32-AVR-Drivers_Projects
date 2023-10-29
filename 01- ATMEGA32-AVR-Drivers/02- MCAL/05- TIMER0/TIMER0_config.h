@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 26 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 29 October 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
+/*               V02 : Fix Errors in Calculations for Delay                    */
 /*******************************************************************************/
 #ifndef TIMER0_CONFIG_H
 #define TIMER0_CONFIG_H
@@ -21,12 +22,12 @@
 /*******************************************************************************/
 /* Options :
 				TIMER0_NORMAL_MODE
-				TIMER0_PHASE_CORRECT_PWM_MODE
+				TIMER0_PHASE_CORRECT_PWM_MODE     |You should set PWM OCR0 as Output|
 				TIMER0_CTC_MODE
-				TIMER0_FAST_PWM_MODE
+				TIMER0_FAST_PWM_MODE			  |You should set PWM OCR0 as Output|
  
 */
-#define TIMER0_MODE              			TIMER0_NORMAL_MODE
+#define TIMER0_MODE              			TIMER0_FAST_PWM_MODE
 /*******************************************************************************/
 /* Options : [PWM]
 				TIMER0_OC0_DISCONNECTED
@@ -35,7 +36,7 @@
 				TIMER0_OC0_SET
  
 */
-#define TIMER0_COMPARE_MATCH_MODE            TIMER0_OC0_CLEAR
+#define TIMER0_COMPARE_MATCH_MODE            TIMER0_OC0_SET
 /*******************************************************************************/
 /*
 	Determine the SYSTEM clock in [HZ] to make the calculations be correct 
