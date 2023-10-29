@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 28 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 29 October 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
+/*               V02 : Fix Errors in Calculations for Delay                    */
 /*******************************************************************************/
 #ifndef	TIMER2_PRIVATE_H
 #define TIMER2_PRIVATE_H
@@ -10,15 +11,15 @@
 /* Struct for [TIMER2] Registers' mapping */
 typedef struct 
 {
-    volatile u8 ASSR          ;
-    volatile u8 OCR2          ;
-    volatile u8 TCNT2         ;
-    volatile u8 TCCR2         ;
+    volatile u8 ASSR   	 	  ;
+    volatile u8 OCR2    	  ;
+    volatile u8 TCNT2   	  ;
+    volatile u8 TCCR2   	  ;
     volatile u8 RESERVED1[10] ;
-    volatile u8 SFIOR         ;
+    volatile u8 SFIOR   	  ;
     volatile u8 RESERVED2[7]  ;
-    volatile u8 TIFR          ;
-    volatile u8 TIMSK         ;
+    volatile u8 TIFR	      ;
+    volatile u8 TIMSK		  ;
 		
 }TIMER2_t;
 

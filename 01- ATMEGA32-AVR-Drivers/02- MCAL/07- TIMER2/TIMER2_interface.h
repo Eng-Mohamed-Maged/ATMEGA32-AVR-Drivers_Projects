@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 28 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 29 October 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
+/*               V02 : Fix Errors in Calculations for Delay                    */
 /*******************************************************************************/
 #ifndef TIMER2_INTERFACE_H
 #define	TIMER2_INTERFACE_H

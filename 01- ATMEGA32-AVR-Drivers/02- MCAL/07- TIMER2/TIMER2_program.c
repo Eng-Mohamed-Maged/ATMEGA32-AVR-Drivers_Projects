@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 28 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 29 October 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
+/*               V02 : Fix Errors in Calculations for Delay                    */
 /*******************************************************************************/
 /* Library includes */
 #include  "../inc/STD_TYPES.h"
@@ -16,7 +17,7 @@
 /* CallBack Function for TIMER2  */
 void (*TIMER2_CallBack[2]) () ;
 u32 Global_u32Number_Of_Overflow = 0;
-u32 Global_u32RemainingTime = 0;
+u8 Global_u8RemainingTime = 0;
 TIMER2_GLOBAL_t TIM2_GLOBAL_FUN = TIMER2_NO_OPERATION ;
 /*******************************************************************************/
 void M_TIMER2_voidInit(void)
@@ -79,23 +80,26 @@ void M_TIMER2_voidSetBusyWait(u32 Copy_u32Time, TIMER2_TIME_t Copy_timeUnit)
 			case TIME_S :
 					Local_u32Load = Copy_u32Time * TIMER2_CLK ;
 					Global_u32Number_Of_Overflow = Local_u32Load / TIMER2_MAXIMUM_VALUE ;
-					Global_u32RemainingTime  = Local_u32Load % TIMER2_MAXIMUM_VALUE;
-
+					Global_u8RemainingTime       = Local_u32Load % TIMER2_MAXIMUM_VALUE ;
+					Global_u8RemainingTime       = (TIMER2_MAXIMUM_VALUE - Global_u8RemainingTime);
+					TIMER2->TCNT2 = Global_u8RemainingTime ;
 	 				break;
 			/*----------------------------------------------------------------------------------*/
 			case TIME_MS :
 					Local_u32Load = Copy_u32Time * (TIMER2_CLK / 1000) ;
 					Global_u32Number_Of_Overflow = Local_u32Load / TIMER2_MAXIMUM_VALUE ;
-					Global_u32RemainingTime  = Local_u32Load % TIMER2_MAXIMUM_VALUE;
-
+					Global_u8RemainingTime       = Local_u32Load % TIMER2_MAXIMUM_VALUE ;
+					Global_u8RemainingTime       = (TIMER2_MAXIMUM_VALUE - Global_u8RemainingTime);
+					TIMER2->TCNT2 = Global_u8RemainingTime ;
 	 				break;
 			/*----------------------------------------------------------------------------------*/
 			case TIME_US :
 					/* Calculate Numbers of Ticks */
 					Local_u32Load = Copy_u32Time * (TIMER2_CLK / 1000000) ;
 					Global_u32Number_Of_Overflow = Local_u32Load / TIMER2_MAXIMUM_VALUE ;
-					Global_u32RemainingTime  = Local_u32Load % TIMER2_MAXIMUM_VALUE;
-
+					Global_u8RemainingTime       = Local_u32Load % TIMER2_MAXIMUM_VALUE ;
+					Global_u8RemainingTime       = (TIMER2_MAXIMUM_VALUE - Global_u8RemainingTime);
+					TIMER2->TCNT2 = Global_u8RemainingTime ;
 	 				break;
 			/*----------------------------------------------------------------------------------*/
 			default :
@@ -141,36 +145,39 @@ void M_TIMER2_voidSetPeriodic(u32 Copy_u32Time, TIMER2_TIME_t Copy_timeUnit, voi
 		#error (" Configuration error")
 	#endif
 	
-	/* Calculate */
-	switch(Copy_timeUnit)
-	{
-		/*----------------------------------------------------------------------------------*/
-		case TIME_S :
-				Local_u32Load = Copy_u32Time * TIMER2_CLK ;
-				Global_u32Number_Of_Overflow = Local_u32Load / TIMER2_MAXIMUM_VALUE ;
-				Global_u32RemainingTime  = Local_u32Load % TIMER2_MAXIMUM_VALUE;
-
-				break;
-		/*----------------------------------------------------------------------------------*/	
-		case TIME_MS :
-				Local_u32Load = Copy_u32Time * (TIMER2_CLK / 1000) ;
-				Global_u32Number_Of_Overflow = Local_u32Load / TIMER2_MAXIMUM_VALUE ;
-				Global_u32RemainingTime  = Local_u32Load % TIMER2_MAXIMUM_VALUE;
-
- 				break;
-		/*----------------------------------------------------------------------------------*/		
-		case TIME_US :
-				/* Calculate Numbers of Ticks */
-				Local_u32Load = Copy_u32Time * (TIMER2_CLK / 1000000) ;
-				Global_u32Number_Of_Overflow = Local_u32Load / TIMER2_MAXIMUM_VALUE ;
-				Global_u32RemainingTime  = Local_u32Load % TIMER2_MAXIMUM_VALUE;
-
- 				break;
-		/*----------------------------------------------------------------------------------*/		
-		default : 
-				break;
-		/*----------------------------------------------------------------------------------*/			
-	}
+		/* Calculate */
+		switch(Copy_timeUnit)
+		{
+			/*----------------------------------------------------------------------------------*/
+			case TIME_S :
+					Local_u32Load = Copy_u32Time * TIMER2_CLK ;
+					Global_u32Number_Of_Overflow = Local_u32Load / TIMER2_MAXIMUM_VALUE ;
+					Global_u8RemainingTime       = Local_u32Load % TIMER2_MAXIMUM_VALUE ;
+					Global_u8RemainingTime       = (TIMER2_MAXIMUM_VALUE - Global_u8RemainingTime);
+					TIMER2->TCNT2 = Global_u8RemainingTime ;
+	 				break;
+			/*----------------------------------------------------------------------------------*/
+			case TIME_MS :
+					Local_u32Load = Copy_u32Time * (TIMER2_CLK / 1000) ;
+					Global_u32Number_Of_Overflow = Local_u32Load / TIMER2_MAXIMUM_VALUE ;
+					Global_u8RemainingTime       = Local_u32Load % TIMER2_MAXIMUM_VALUE ;
+					Global_u8RemainingTime       = (TIMER2_MAXIMUM_VALUE - Global_u8RemainingTime);
+					TIMER2->TCNT2 = Global_u8RemainingTime ;
+	 				break;
+			/*----------------------------------------------------------------------------------*/
+			case TIME_US :
+					/* Calculate Numbers of Ticks */
+					Local_u32Load = Copy_u32Time * (TIMER2_CLK / 1000000) ;
+					Global_u32Number_Of_Overflow = Local_u32Load / TIMER2_MAXIMUM_VALUE ;
+					Global_u8RemainingTime       = Local_u32Load % TIMER2_MAXIMUM_VALUE ;
+					Global_u8RemainingTime       = (TIMER2_MAXIMUM_VALUE - Global_u8RemainingTime);
+					TIMER2->TCNT2 = Global_u8RemainingTime ;
+	 				break;
+			/*----------------------------------------------------------------------------------*/
+			default :
+					break;
+			/*----------------------------------------------------------------------------------*/
+		}
 	
 	
 	/* Set call back function */
@@ -277,11 +284,12 @@ TIMER2_Overflow_IRQHandler
 	{
 		static u32 Timer_Overflow_counter = 0;
 		Timer_Overflow_counter++;
-		if(Timer_Overflow_counter == Global_u32Number_Of_Overflow)
+		if(Timer_Overflow_counter == Global_u32Number_Of_Overflow+1)
 		{
-			TIMER2->OCR2 = Global_u32RemainingTime;
-			Timer_Overflow_counter = 0 ;
 			TIMER2_CallBack[0]();
+			Timer_Overflow_counter = 0 ;
+			TIMER2->TCNT2 = Global_u8RemainingTime;
+
 		}
 	}
 
@@ -289,12 +297,14 @@ TIMER2_Overflow_IRQHandler
 	{
 		static u32 Timer_Overflow_counter = 0;
 		Timer_Overflow_counter++;
-		if(Timer_Overflow_counter == Global_u32Number_Of_Overflow)
+		if(Timer_Overflow_counter == Global_u32Number_Of_Overflow+1)
 		{
-			TIMER2->OCR2 = Global_u32RemainingTime;
 			Timer_Overflow_counter = 0 ;
 			TIM2_GLOBAL_FUN = TIMER2_NO_OPERATION ;
-
+		}
+		else if(Global_u32Number_Of_Overflow == 0)
+		{
+			TIM2_GLOBAL_FUN = TIMER2_NO_OPERATION ;
 		}
 	}
 }

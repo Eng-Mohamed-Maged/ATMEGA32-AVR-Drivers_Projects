@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 28 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 29 October 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
+/*               V02 : Fix Errors in Calculations for Delay                    */
 /*******************************************************************************/
 #ifndef TIMER2_CONFIG_H
 #define TIMER2_CONFIG_H
@@ -17,7 +18,7 @@
 				TIMER2_PRESCALER_256 
 				TIMER2_PRESCALER_1024
 */
-#define TIMER2_PRESCALER              		TIMER2_PRESCALER_1024
+#define TIMER2_PRESCALER              		TIMER2_PRESCALER_64
 /*******************************************************************************/
 /* Options :
 				TIMER2_NORMAL_MODE
