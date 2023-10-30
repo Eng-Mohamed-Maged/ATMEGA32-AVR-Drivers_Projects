@@ -1,20 +1,25 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 23 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 30 October 2023                                               */
 /*   Logs      : V01 : Initial Creation                                        */
+/*               V02 : Fix some Errors in Display                              */
 /*******************************************************************************/
 #include "../inc/STD_TYPES.h"
 #include "../inc/BIT_MATH.h"
-
+/*******************************************************************************/
 #define F_CPU 16000000UL
 #include "util/delay.h"
-
+/*******************************************************************************/
 #include "../inc/DIO_interface.h"
-
+/*******************************************************************************/
 #include "../inc/LCD_interface.h"
 #include "../inc/LCD_private.h"
 #include "../inc/LCD_config.h"
+/*******************************************************************************/
+static u8 Global_u8Current_line = 0;
+static u8 Global_u8Current_col = 0;
+/*******************************************************************************/
 
 u8 LCD_PORTS_PINS[22]= {
 					LCD_RS_PORT_PIN ,        // 0
@@ -30,8 +35,7 @@ u8 LCD_PORTS_PINS[22]= {
                     LCD_D7_PORT_PIN	         // 21
 				};
 				
- 
- 
+/*******************************************************************************/
 void H_LCD_void_Init(void)
  {
 	/* SET Direction as OUTPUT for RS,RW,EN */
@@ -109,31 +113,51 @@ void H_LCD_void_Init(void)
 		H_LCD_void_sendCommand(0b00000110);
 
 
-/*
-		H_LCD_void_sendCommand(0X02);
-		H_LCD_void_sendCommand(0X28);
-		H_LCD_void_sendCommand(0X0c);
-		H_LCD_void_sendCommand(0X01);
-		_delay_ms(1);
-		H_LCD_void_sendCommand(0X06);
-*/
 	#endif
 	
  }
-	 
-	 
 
-	 
-void H_LCD_void_sendData(u8 copy_u8data )
+
+
+
+void H_LCD_void_sendData(u8 copy_u8data)
 {
-	// Write Data => RS = 1
-	DIO_voidSetPinValue(LCD_RS_PORT_PIN,HIGH);
+    // Write Data => RS = 1
+    DIO_voidSetPinValue(LCD_RS_PORT_PIN, HIGH);
+
+    // Send Data to Latch Function
+    H_LCD_void_latchByte(copy_u8data);
+
+    // Update the current position
+    Global_u8Current_col++;
+
+    if (Global_u8Current_col >= LCD_COLUMNS)
+    {
+        Global_u8Current_col = 0;  // Reset column
+        if (Global_u8Current_line < (LCD_ROW - 1))  // Check if not on the last line
+        {
+            Global_u8Current_line++;   // Move to the next line
+        }
+        else if(Global_u8Current_line == (LCD_ROW - 1))
+        {
+        	Global_u8Current_line = 0;
+            H_LCD_void_sendCommand(LCD_CLEAR);  // Clear the LCD
+
+        }
+        else
+        {
+            // If the cursor is on the last line, don't wrap, stay on the last line
+            Global_u8Current_col = LCD_COLUMNS  ;
+        }
+
+        // Set the cursor position for the next line
+        H_LCD_void_gotoXY(Global_u8Current_line, Global_u8Current_col);
+    }
 
 
-	// Send Data to Latch Function
-	H_LCD_void_latchByte(copy_u8data);
 
 }
+
 
 void H_LCD_void_sendCommand(u8 copy_u8command)
 {
@@ -146,7 +170,19 @@ void H_LCD_void_sendCommand(u8 copy_u8command)
 
 }
 
+void H_LCD_void_sendString(const s8 *pstr)
+{
+	u8 Local_u8Counter = 0;
+    while (pstr[Local_u8Counter] != '\0')
+    {
+        H_LCD_void_sendData(pstr[Local_u8Counter]);
+        Local_u8Counter++;
+    }
+    Global_u8Current_col -= 1 ;
+}
 
+
+/*
 void H_LCD_void_sendString(const s8 *pstr) {
     u8 i = 0;
     u8 line = 0;
@@ -165,7 +201,7 @@ void H_LCD_void_sendString(const s8 *pstr) {
 
     }
 }
-
+*/
 
 void H_LCD_void_ShiftString(const s8 *pstr, u8 copy_u8lineNumber)
 {
@@ -211,13 +247,17 @@ void H_LCD_void_clearLine(u8 copy_u8lineNumber)
     }
 }
 
-
-
 void H_LCD_void_gotoXY(u8 copy_u8Row, u8 copy_u8Col)
 {
-	// Row offsets for a 4x20 LCD
+    Global_u8Current_line = copy_u8Row;
+    Global_u8Current_col  = copy_u8Col;
+
+    // Calculate the position for a 4x20 LCD (modify as needed for your specific LCD)
     u8 row_offsets[] = {0x00, 0x40, 0x14, 0x54};
-    H_LCD_void_sendCommand(0x80 | (row_offsets[copy_u8Row] + copy_u8Col));
+    u8 position = copy_u8Col + row_offsets[copy_u8Row];
+
+    // Send the command to set the cursor position
+    H_LCD_void_sendCommand(0x80 | position);
 }
 
 
@@ -258,6 +298,9 @@ void H_LCD_void_sendIntNum(s32 copy_s32Num)
 
 void H_LCD_void_creatCustomChar(const u8 *ArrPattern, u8 copy_u8charCode)
 {
+	u8 Local_u8Temp_Line = Global_u8Current_line;
+	u8 Local_u8Temp_Col =  Global_u8Current_col;
+
     // Set CGRAM address to write the custom character (0 to 7)
     H_LCD_void_sendCommand(0x40 | (copy_u8charCode << 3));
 
@@ -266,12 +309,17 @@ void H_LCD_void_creatCustomChar(const u8 *ArrPattern, u8 copy_u8charCode)
     {
         H_LCD_void_sendData(ArrPattern[i]);
     }
+
+    Global_u8Current_line =  Local_u8Temp_Line ;
+    Global_u8Current_col  =  Local_u8Temp_Col  ;
+
     // Return to the DDRAM address
     H_LCD_void_sendCommand(0x80);
 }
 
 void H_LCD_void_displayCustomChar(u8 copy_u8charCode)
 {
+
     // Send the custom character using its character code (0 to 7)
     H_LCD_void_sendData(copy_u8charCode);
 }

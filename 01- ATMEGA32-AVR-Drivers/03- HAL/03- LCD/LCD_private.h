@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 23 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 30 October 2023                                               */
 /*   Logs      : V01 : Initial Creation                                        */
+/*               V02 : Fix some Errors in Display                              */
 /*******************************************************************************/
 #ifndef _LCD_PRIVATE_H
 #define _LCD_PRIVATE_H
