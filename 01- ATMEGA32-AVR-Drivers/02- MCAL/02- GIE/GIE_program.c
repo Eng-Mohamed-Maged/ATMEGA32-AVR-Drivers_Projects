@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 22 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 30 October 2023                                               */
 /*   Logs      : V01 : Initial Creation                                        */
+/*               V02 : Replacing "asm" instruction                             */
 /*******************************************************************************/
 
 #include  "../inc/STD_TYPES.h"
@@ -16,7 +17,7 @@
 
 void MGIE_voidEnable(void)
 {
-	asm("SEI");
+	GIE->SREG  |= (GIE_ENABLE  << GIE_BIT) ;
 }
 
 
@@ -25,6 +26,6 @@ void MGIE_voidEnable(void)
 
 void MGIE_voidDisable(void)
 {	
- 	asm("CLI");
+	GIE->SREG  |= (GIE_DISABLE  << GIE_BIT) ;
 }
 
