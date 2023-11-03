@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 31 October 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 3 November 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
+/*               V02 : Adding All Error States                                 */
 /*******************************************************************************/
 /* Library includes */
 #include  "../inc/STD_TYPES.h"
@@ -95,7 +96,7 @@ void M_I2C_voidReceiveByte_NOACK(u8 * Copy_Byte_NOACK)
 }
 /*********************************************************************************/
 /*********************************************************************************/
-void M_I2C_voidGetStatus(u8 * Copy_Status)
+void M_I2C_voidGetStatus(I2C_STATUS_t * Copy_Status)
 {
 	// Read status and Mask the prescaler bits
 	*Copy_Status = (I2C->TWSR & I2C_STATUS_MASK);
