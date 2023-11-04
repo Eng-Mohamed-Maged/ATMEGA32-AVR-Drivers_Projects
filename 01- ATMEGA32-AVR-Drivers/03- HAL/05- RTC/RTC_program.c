@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 3 November 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 4 November 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
+/*               V02 : Adding New Features                                     */
 /*******************************************************************************/
 #define F_CPU 16000000UL
 #include "util/delay.h"
@@ -98,7 +99,7 @@ void H_RTC_SetDate(RTC_DAY_MODE_t  Copy_DAY     	,
 	M_I2C_voidSendStop_Condition();
 }
 /*******************************************************************************/
-void H_RTC_GetTime(u8 * Copy_Hours ,u8 * Copy_Minutes,u8 * Copy_Seconds)
+void H_RTC_GetTime(u8 * Copy_Hours ,u8 * Copy_Minutes,u8 * Copy_Seconds ,u8 * Copy_AM_PM)
 {
 	u8 Local_u8Hours = 0;
 	u8 Local_u8Min   = 0;
@@ -128,7 +129,15 @@ void H_RTC_GetTime(u8 * Copy_Hours ,u8 * Copy_Minutes,u8 * Copy_Seconds)
 	// Read Hours [NOACK]
 	M_I2C_voidReceiveByte_NOACK(&Local_u8Hours);
 
-	*Copy_Hours   = RTC_u8ConvertBCDToDecimal(Local_u8Hours) ;
+	if(GET_BIT(Local_u8Hours,RTC_BIT6) == RTC_HOUR_12)
+	{
+		*Copy_AM_PM = GET_BIT(Local_u8Hours,RTC_BIT5);
+	}
+	else
+	{
+		*Copy_AM_PM = RTC_ERROR ;
+	}
+	*Copy_Hours   = RTC_u8ConvertBCDToDecimal(Local_u8Hours & 0x1F) ;
 	*Copy_Minutes = RTC_u8ConvertBCDToDecimal(Local_u8Min)   ;
 	*Copy_Seconds = RTC_u8ConvertBCDToDecimal(Local_u8Sec)   ;
 
@@ -136,8 +145,9 @@ void H_RTC_GetTime(u8 * Copy_Hours ,u8 * Copy_Minutes,u8 * Copy_Seconds)
 	M_I2C_voidSendStop_Condition();
 }
 /****************************************************************************/
-void H_RTC_GetDate(u8 * Copy_Date  ,u8 * Copy_Month  ,u8 * Copy_Year)
+void H_RTC_GetDate(u8 * Copy_Date  ,u8 * Copy_Month  ,u8 * Copy_Year,u8 * Copy_Day)
 {
+	u8 Local_u8Day    = 0;
 	u8 Local_u8Date   = 0;
 	u8 Local_u8Month  = 0;
 	u8 Local_u8Year   = 0;
@@ -148,14 +158,17 @@ void H_RTC_GetDate(u8 * Copy_Date  ,u8 * Copy_Month  ,u8 * Copy_Year)
 	// Address of RTC for Writing
 	M_I2C_voidSendByte(RTC_WRITE_ADDRESS);
 
-	/* Address for DATE BYTE MEMORY */
-	M_I2C_voidSendByte(RTC_DATE);
+	/* Address for Day BYTE MEMORY */
+	M_I2C_voidSendByte(RTC_DAY);
 
 	// Send Repeated Start
 	M_I2C_voidSendStart_Condition();
 
 	// Address of RTC for reading
 	M_I2C_voidSendByte(RTC_READ_ADDRESS);
+
+	// Read Day
+	M_I2C_voidReceiveByte_ACK(&Local_u8Day);
 
 	// Read Date
 	M_I2C_voidReceiveByte_ACK(&Local_u8Date);
@@ -166,10 +179,11 @@ void H_RTC_GetDate(u8 * Copy_Date  ,u8 * Copy_Month  ,u8 * Copy_Year)
 	// Read Hours [NOACK]
 	M_I2C_voidReceiveByte_NOACK(&Local_u8Year);
 
+
 	*Copy_Date   = RTC_u8ConvertBCDToDecimal(Local_u8Date)  ;
 	*Copy_Month  = RTC_u8ConvertBCDToDecimal(Local_u8Month) ;
 	*Copy_Year   = RTC_u8ConvertBCDToDecimal(Local_u8Year)  ;
-
+	*Copy_Day    = RTC_u8ConvertBCDToDecimal(Local_u8Day)   ;
 	// Send Stop Condition
 	M_I2C_voidSendStop_Condition();
 }

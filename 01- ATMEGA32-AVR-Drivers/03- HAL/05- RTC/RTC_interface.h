@@ -1,8 +1,9 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V01                                                           */
-/*   Date      : 3 November 2023                                               */
+/*   Version   : V02                                                           */
+/*   Date      : 4 November 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
+/*               V02 : Adding New Features                                     */
 /*******************************************************************************/
 #ifndef RTC_INTERFACE_H
 #define	RTC_INTERFACE_H
@@ -43,7 +44,7 @@ typedef enum
 /****************************************************************************/
 typedef enum
 {
-	RTC_SAT      = 0 ,
+	RTC_SAT      = 1 ,
 	RTC_SUN          ,
 	RTC_MON          ,
 	RTC_TUE          ,
@@ -66,9 +67,9 @@ void H_RTC_SetDate(RTC_DAY_MODE_t  Copy_DAY     	,
 				   u8 Copy_Month   				    ,
 				   u8 Copy_Year  				   );
 /****************************************************************************/
-void H_RTC_GetTime(u8 * Copy_Hours ,u8 * Copy_Minutes,u8 * Copy_Seconds);
+void H_RTC_GetTime(u8 * Copy_Hours ,u8 * Copy_Minutes,u8 * Copy_Seconds ,u8 * Copy_AM_PM);
 /****************************************************************************/
-void H_RTC_GetDate(u8 * Copy_Date  ,u8 * Copy_Month  ,u8 * Copy_Year);
+void H_RTC_GetDate(u8 * Copy_Date  ,u8 * Copy_Month  ,u8 * Copy_Year,u8 * Copy_Day);
 /****************************************************************************/
  
 void H_RTC_EraseByte(u16 Copy_u16Address);
