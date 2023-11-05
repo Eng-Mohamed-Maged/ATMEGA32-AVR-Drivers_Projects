@@ -1,5 +1,5 @@
-# ATMEGA32-AVR ADC-LCD DRIVERS Testing
-Testing [ADC] Driver by using LDR Sensor with LCD
+# ATMEGA32-AVR RTC-I2C DRIVERS Testing
+Testing [RTC] Driver by using [I2C] Driver with LCD
 
 # Table of Contents
 - [Introduction](#Introduction)
