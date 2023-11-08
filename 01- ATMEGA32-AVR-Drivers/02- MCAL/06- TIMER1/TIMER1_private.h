@@ -1,9 +1,11 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V02                                                           */
-/*   Date      : 2 November 2023                                               */
+/*   Version   : V03                                                           */
+/*   Date      : 8 November 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
 /*               V02 : Fast PWM and Phase Correct PWM are fixed                */
+/*               V03 : Adding ICU Feature to Calculate :                       */
+/*                     [Duty Cycle] in % - [Time ON/OFF] in US                 */
 /*******************************************************************************/
 #ifndef	TIMER1_PRIVATE_H
 #define TIMER1_PRIVATE_H
@@ -11,19 +13,18 @@
 /* Struct for [TIMER1] Registers' mapping */
 typedef struct 
 {
-    volatile u8 ICR1L          ;
-    volatile u8 ICR1H          ;
-    volatile u8 OCR1BL         ;
-    volatile u8 OCR1BH         ;
-    volatile u8 OCR1AL		   ;
-    volatile u8 OCR1AH         ;
-    volatile u8 TCNT1L		   ;
-    volatile u8 TCNT1H         ;
-    volatile u8 TCCR1B         ;
-    volatile u8 TCCR1A         ;
-    volatile u8 RESERVED0[8]   ;
-    volatile u8 TIFR   		   ;
-    volatile u8 TIMSK          ;
+    volatile u16 ICR1L_ICR1H    ;
+    volatile u8  OCR1BL         ;
+    volatile u8  OCR1BH         ;
+    volatile u8  OCR1AL		    ;
+    volatile u8  OCR1AH         ;
+    volatile u8  TCNT1L		    ;
+    volatile u8  TCNT1H         ;
+    volatile u8  TCCR1B         ;
+    volatile u8  TCCR1A         ;
+    volatile u8  RESERVED0[8]   ;
+    volatile u8  TIFR   		;
+    volatile u8  TIMSK          ;
 		
 }TIMER1_t;
 
@@ -94,6 +95,13 @@ typedef struct
 /***************************************************************************************/
 #define    TIMER1_ICU_NOISE_CANCELER_ENABLE               1
 #define    TIMER1_ICU_NOISE_CANCELER_DISABLE              0
+/***************************************************************************************/
+#define    TIMER1_TOV1_BIT                                2
+#define    TIMER1_OCF1B_BIT                               3
+#define    TIMER1_OCF1A_BIT                               4
+#define    TIMER1_ICF1_BIT                                5
+/***************************************************************************************/
+#define    TIMER1_PWM_ERROR                               1
 /***************************************************************************************/
 /* Timer/Counter1 Capture Event */
 #define TIMER1_Capture_Event_IRQHandler            \

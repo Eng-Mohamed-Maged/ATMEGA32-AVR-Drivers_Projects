@@ -1,9 +1,11 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V02                                                           */
-/*   Date      : 2 November 2023                                               */
+/*   Version   : V03                                                           */
+/*   Date      : 8 November 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
 /*               V02 : Fast PWM and Phase Correct PWM are fixed                */
+/*               V03 : Adding ICU Feature to Calculate :                       */
+/*                     [Duty Cycle] in % - [Time ON/OFF] in US                 */
 /*******************************************************************************/
 #ifndef TIMER1_INTERFACE_H
 #define	TIMER1_INTERFACE_H
@@ -42,8 +44,6 @@ typedef enum{
 }TIMER1_OC1_CHANNEL_t;
 
 
-void FAST_PWM_MODE14(void);
-
 
 
 
@@ -56,9 +56,10 @@ void M_TIMER1_voidInterrupt_Enable(TIMER1_INT_t Copy_Interrupt_ID);
 void M_TIMER1_voidInterrupt_Disable(TIMER1_INT_t Copy_Interrupt_ID);
 void M_TIMER1_voidSetFastPWM(u8 Copy_u8DutyCycle,TIMER1_OC1_CHANNEL_t Copy_OC1Channel);
 void M_TIMER1_voidSetPhaseCorrectPWM(u8 Copy_u8DutyCycle,TIMER1_OC1_CHANNEL_t Copy_OC1Channel);
-
 void M_TIMER1_voidICU_SetEventTrigger(TIMER1_EVENT_t Copy_CaptureEvent);
-void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle);
+void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle,u8 * Copy_ptrTimeOn_US,u8 * Copy_ptrTimeOff_US);
+
+
 
 
 #endif

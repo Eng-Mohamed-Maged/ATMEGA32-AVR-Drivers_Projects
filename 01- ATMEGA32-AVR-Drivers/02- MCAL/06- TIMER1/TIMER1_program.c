@@ -1,9 +1,11 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V02                                                           */
-/*   Date      : 2 November 2023                                               */
+/*   Version   : V03                                                           */
+/*   Date      : 8 November 2023                                               */
 /*   Logs      : V01 : Initial creation                                        */
 /*               V02 : Fast PWM and Phase Correct PWM are fixed                */
+/*               V03 : Adding ICU Feature to Calculate :                       */
+/*                     [Duty Cycle] in % - [Time ON/OFF] in US                 */
 /*******************************************************************************/
 /* Library includes */
 #include  "../inc/STD_TYPES.h"
@@ -16,50 +18,11 @@
 /*******************************************************************************/
 /* CallBack Function for TIMER1  */
 void (*TIMER1_CallBack[4]) () ;
-u32 Global_u32Number_Of_Overflow_CaptureUnit = 0;
-u32 Global_u32Number_Of_Overflow = 0;
-u32 Global_u32ICR_StartTicks = 0;
+volatile u16 Global_u16Number_Of_Overflow_CaptureUnit = 0;
+volatile u32 Global_u32Number_Of_Overflow = 0;
+u16 Global_u16NumberOVF_ICU = 0 ;
 u16 Global_u16RemainingTime = 0;
 TIMER1_GLOBAL_t TIM1_GLOBAL_FUN = TIMER1_NO_OPERATION ;
-/*******************************************************************************/
-void FAST_PWM_MODE14(void)
-{
-	  // Clear OC1A and OC1B on Compare Match / Set OC1A and OC1B at Bottom;
-	  // Wave Form Generator: Fast PWM 14, Top = ICR1
-//	TIMER1->TCCR1A = (1<<7) + (1<<5) + (1<<1);
-
-	/********* Compare Output Mode Channel A  **********/
-	TIMER1->TCCR1A &= TIMER1_MODE_MASKING ;
-	TIMER1->TCCR1A |= (TIMER1_COMPARE_MATCH_A_MODE << 6)  ;
-	TIMER1->TCCR1A |= (TIMER1_COMPARE_MATCH_B_MODE << 4)  ;
-	/********* Compare Output Mode Channel B  **********/
-
-
-
-
-	/********** Waveform Generation Mode ***************/
-	TIMER1->TCCR1B &= TIMER1_MODE_MASKING ;
-	TIMER1->TCCR1A |= ((TIMER1_MODE >> 8) & 0xFF);
-	TIMER1->TCCR1B |=  TIMER1_MODE & 0xFF ;
-
-
-
-	u16  ICR1_VALUE = 15999;
-	u16  OCR1A_VALUE = 7999;
-	u16  OCR1B_VALUE = 7999;
-
-	TIMER1->ICR1H = (ICR1_VALUE >> 8) & 0xFF; // High Byte
-	TIMER1->ICR1L = ICR1_VALUE & 0xFF;        // Low Byte
-
-	TIMER1->OCR1AH = (OCR1A_VALUE >> 8) & 0xFF; // High Byte
-	TIMER1->OCR1AL =  OCR1A_VALUE & 0xFF;        // Low Byte
-
-	TIMER1->OCR1BH = (OCR1B_VALUE >> 8) & 0xFF; // High Byte
-	TIMER1->OCR1BL =  OCR1B_VALUE & 0xFF;        // Low Byte
-
-	M_TIMER1_voidStart();
-
-}
 /*******************************************************************************/
 void M_TIMER1_voidInit(void)
 {
@@ -285,7 +248,6 @@ void M_TIMER1_voidInterrupt_Disable(TIMER1_INT_t Copy_Interrupt_ID)
 	}
 }
 /*******************************************************************************/
-
 void M_TIMER1_voidSetFastPWM(u8 Copy_u8DutyCycle,TIMER1_OC1_CHANNEL_t Copy_OC1Channel)
 {
 	#if ((TIMER1_MODE == TIMER1_FAST_PWM_8Bit)||(TIMER1_MODE == TIMER1_FAST_PWM_9Bit)||(TIMER1_MODE == TIMER1_FAST_PWM_10Bit)||(TIMER1_MODE == TIMER1_FAST_PWM_ICR1)||(TIMER1_MODE == TIMER1_FAST_PWM_OCR1A))
@@ -352,7 +314,7 @@ void M_TIMER1_voidSetFastPWM(u8 Copy_u8DutyCycle,TIMER1_OC1_CHANNEL_t Copy_OC1Ch
 		#warning "[Fast PWM] is Disabled"
 	#endif
 }
-
+/*******************************************************************************/
 void M_TIMER1_voidSetPhaseCorrectPWM(u8 Copy_u8DutyCycle,TIMER1_OC1_CHANNEL_t Copy_OC1Channel)
 {
 	#if ((TIMER1_MODE == TIMER1_PHASE_CORRECT_PWM_8Bit)||(TIMER1_MODE == TIMER1_PHASE_CORRECT_PWM_9Bit)||(TIMER1_MODE == TIMER1_PHASE_CORRECT_PWM_10Bit)||(TIMER1_MODE == TIMER1_PHASE_CORRECT_PWM_ICR1)||(TIMER1_MODE == TIMER1_PHASE_CORRECT_PWM_OCR1A))
@@ -416,7 +378,7 @@ void M_TIMER1_voidSetPhaseCorrectPWM(u8 Copy_u8DutyCycle,TIMER1_OC1_CHANNEL_t Co
 		#warning "[Phase Correct PWM] is Disabled"
 	#endif
 }
-
+/*******************************************************************************/
 void M_TIMER1_voidICU_SetEventTrigger(TIMER1_EVENT_t Copy_CaptureEvent)
 {
 	if(Copy_CaptureEvent == TIMER1_FALLING_EDGE)
@@ -428,9 +390,11 @@ void M_TIMER1_voidICU_SetEventTrigger(TIMER1_EVENT_t Copy_CaptureEvent)
 		SET_BIT(TIMER1->TCCR1B , TIMER1_ICES1_BIT);
 	}
 }
+/*******************************************************************************/
+/*******************************************************************************/
+/*******************************************************************************/
 
-
-void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle)
+void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle,u8 * Copy_ptrTimeOn_US,u8 * Copy_ptrTimeOff_US)
 {
 
 	TIM1_GLOBAL_FUN = TIMER1_INPUT_CAPTURE_UNIT_FUNCTION;
@@ -442,6 +406,13 @@ void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle)
 
 	M_TIMER1_voidInterrupt_Enable(TIMER1_OVERFLOW_INTERRUPT);
 	M_TIMER1_voidInterrupt_Enable(TIMER1_EVENT_INTERRUPT);
+
+    TIMER1->TCNT1H = 0; // Clear the counter
+    TIMER1->TCNT1L = 0;
+    Global_u16Number_Of_Overflow_CaptureUnit = 0;
+	/* Clear Input Capture flag by writing 1 */
+	SET_BIT(TIMER1->TIFR,TIMER1_ICF1_BIT);
+
 	/* Enable Rising Edge Trigger */
 	M_TIMER1_voidICU_SetEventTrigger(TIMER1_RAISING_EDGE);
 
@@ -449,28 +420,27 @@ void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle)
     M_TIMER1_voidStart();
 
 	// Wait for the first edge to capture [First Reading]
-	while (GET_BIT(TIMER1->TIFR, 5) == 0);
-	Global_u32Number_Of_Overflow_CaptureUnit = 0;
+	while (GET_BIT(TIMER1->TIFR, TIMER1_ICF1_BIT) == 0);
 
 	// Capture the initial count [First Reading]
-    u16 Local_u16StartCaptureValue = ((TIMER1->ICR1H << 8) | (TIMER1->ICR1L));
+    u16 Local_u16StartCaptureValue =  TIMER1->ICR1L_ICR1H;
     u16 Local_u16SecondCaptureValue   = 0;
     /* Clear the TCNT1 to calculate number of overflows */
-    TIMER1->TCNT1H = 0; // Clear the counter
-    TIMER1->TCNT1L = 0;
+
+	/* Clear Input Capture flag by writing 1 */
+	SET_BIT(TIMER1->TIFR,TIMER1_ICF1_BIT);
 
     // Wait for the next edge to capture  [Second Reading]
-	while (GET_BIT(TIMER1->TIFR, 5) == 0);
+	while (GET_BIT(TIMER1->TIFR, TIMER1_ICF1_BIT) == 0);
 
 	// Capture the final count [Second Reading]
-    Local_u16SecondCaptureValue = ((TIMER1->ICR1H << 8) | (TIMER1->ICR1L));
+    Local_u16SecondCaptureValue =  TIMER1->ICR1L_ICR1H;
 
     /* Calculate Number of overflows between [First Reading] and [Second Reading] */
-    u16 Local_NumberOVF = Global_u32Number_Of_Overflow_CaptureUnit;
     u32 Local_u32Period = 0;
 
     /* IF there is no Overflow */
-    if(Local_NumberOVF == 0)
+    if(Global_u16NumberOVF_ICU == 0)
     {
     	// Calculate the duty cycle based on the captured values  ([Second Reading] - [First Reading])
     	 Local_u32Period  = Local_u16SecondCaptureValue - Local_u16StartCaptureValue;
@@ -478,40 +448,45 @@ void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle)
     else
     {
     	// Calculate the duty cycle based on the captured values
-    	 Local_u32Period  = (Local_NumberOVF * TIMER1_MAXIMUM_VALUE) + Local_u16SecondCaptureValue;
+        Local_u32Period = ((u32)Global_u16NumberOVF_ICU * TIMER1_MAXIMUM_VALUE) + Local_u16SecondCaptureValue - Local_u16StartCaptureValue;
     }
 	/* Enable Falling Edge Trigger */
 	M_TIMER1_voidICU_SetEventTrigger(TIMER1_FALLING_EDGE);
-    /* Clear the TCNT1 to calculate number of overflows */
-    TIMER1->TCNT1H = 0; // Clear the counter
-    TIMER1->TCNT1L = 0;
-    Global_u32Number_Of_Overflow_CaptureUnit = 0;
+
+	/* Clear Input Capture flag by writing 1 */
+	SET_BIT(TIMER1->TIFR,TIMER1_ICF1_BIT);
     // Wait for the next edge to capture  [End Reading]
-	while (GET_BIT(TIMER1->TIFR, 5) == 0);
-	Local_NumberOVF = Global_u32Number_Of_Overflow_CaptureUnit;
+	while (GET_BIT(TIMER1->TIFR, TIMER1_ICF1_BIT) == 0);
 
 	// Capture the Final count [End Reading]
-    u16 Local_u16EndCaptureValue = ((TIMER1->ICR1H << 8) | (TIMER1->ICR1L));
+    u16 Local_u16EndCaptureValue =  TIMER1->ICR1L_ICR1H;
 
     u32 Local_u32Time_ON = 0;
     /* IF there is no Overflow */
-    if(Local_NumberOVF == 0)
+    if(Global_u16NumberOVF_ICU == 0)
     {
        Local_u32Time_ON = Local_u16EndCaptureValue - Local_u16SecondCaptureValue;
     }
     else
     {
-        Local_u32Time_ON = (Local_NumberOVF * TIMER1_MAXIMUM_VALUE) + Local_u16SecondCaptureValue;
+    	Local_u32Time_ON = ((u32)(Global_u16NumberOVF_ICU * TIMER1_MAXIMUM_VALUE)) - Local_u16SecondCaptureValue + Local_u16EndCaptureValue;
     }
 
     // Calculate duty cycle as a percentage
-    u8 Local_u8DutyCycle = ((u8)((Local_u32Time_ON/ Local_u32Period))) * 100 ;
+    u8 Local_u8DutyCycle = (u8)((Local_u32Time_ON * 100) / Local_u32Period);
 
-    *Copy_ptrGetDutyCycle = Local_u8DutyCycle;
 
-    // Clear the input capture flag
-    SET_BIT(TIMER1->TIFR, 5);
+    *Copy_ptrTimeOn_US  = (Local_u32Time_ON * TIMER1_PRESCALER * 1000000)/SYSTEM_CLOCK_SOURCE ;
+    *Copy_ptrTimeOff_US = ((Local_u32Period - Local_u32Time_ON) * TIMER1_PRESCALER * 1000000)/SYSTEM_CLOCK_SOURCE ;
+    *Copy_ptrGetDutyCycle = Local_u8DutyCycle + TIMER1_PWM_ERROR;
 
+
+    /* Clear the TCNT1 to calculate number of overflows */
+    TIMER1->TCNT1H = 0; // Clear the counter
+    TIMER1->TCNT1L = 0;
+    Global_u16Number_Of_Overflow_CaptureUnit = 0;
+	/* Clear Input Capture flag by writing 1 */
+	SET_BIT(TIMER1->TIFR,TIMER1_ICF1_BIT);
 	M_TIMER1_voidInterrupt_Disable(TIMER1_OVERFLOW_INTERRUPT);
 	M_TIMER1_voidInterrupt_Disable(TIMER1_EVENT_INTERRUPT);
 
@@ -524,13 +499,14 @@ void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle)
 /*******************************************************************************/
 /*******************************************************************************/
 /*******************************************************************************/
+/*******************************************************************************/
 /* Timer/Counter1 Capture Event */
 TIMER1_Capture_Event_IRQHandler
 {
-//	TIMER1_CallBack[3]();
-	static u32 Timer_Capture_Event_Overflow_counter = 0;
-	Timer_Capture_Event_Overflow_counter++;
-
+    TIMER1->TCNT1H = 0; // Clear the counter
+    TIMER1->TCNT1L = 0;
+    Global_u16NumberOVF_ICU = Global_u16Number_Of_Overflow_CaptureUnit;
+    Global_u16Number_Of_Overflow_CaptureUnit = 0;
 }
 
 /*******************************************************************************/
@@ -590,7 +566,7 @@ TIMER1_OVERFLOW_IRQHandler
 	/*******************************************************************************/
 	else if (TIM1_GLOBAL_FUN == TIMER1_INPUT_CAPTURE_UNIT_FUNCTION)
 	{
-		Global_u32Number_Of_Overflow_CaptureUnit++;
+		Global_u16Number_Of_Overflow_CaptureUnit++;
 	}
 }
 /*******************************************************************************/
