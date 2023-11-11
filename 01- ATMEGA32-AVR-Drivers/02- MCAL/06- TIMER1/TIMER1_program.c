@@ -500,7 +500,7 @@ void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle,u32 * Copy_ptrTimeO
 
 }
 
-void M_TIMER1_voidICU_GetTimeOn_us(u32 * Copy_ptrTimeOn_US)
+void M_TIMER1_voidICU_GetTimeOn_us(f32 * Copy_ptrTimeOn_US)
 {
 
 	TIM1_GLOBAL_FUN = TIMER1_INPUT_CAPTURE_UNIT_FUNCTION;

@@ -52,7 +52,7 @@ void M_TIMER1_voidSetFastPWM(u8 Copy_u8DutyCycle,TIMER1_OC1_CHANNEL_t Copy_OC1Ch
 void M_TIMER1_voidSetPhaseCorrectPWM(u8 Copy_u8DutyCycle,TIMER1_OC1_CHANNEL_t Copy_OC1Channel);
 void M_TIMER1_voidICU_SetEventTrigger(TIMER1_EVENT_t Copy_CaptureEvent);
 void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle,u32 * Copy_ptrTimeOn_US,u32 * Copy_ptrTimeOff_US);
-void M_TIMER1_voidICU_GetTimeOn_us(u32 * Copy_ptrTimeOn_US);
+void M_TIMER1_voidICU_GetTimeOn_us(f32 * Copy_ptrTimeOn_US);
 /*************************************************************************************************************/
 
 
