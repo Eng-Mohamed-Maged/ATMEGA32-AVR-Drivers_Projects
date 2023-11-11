@@ -1,11 +1,12 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V03                                                           */
-/*   Date      : 8 November 2023                                               */
+/*   Version   : V04                                                           */
+/*   Date      : 11 November 2023                                              */
 /*   Logs      : V01 : Initial creation                                        */
 /*               V02 : Fast PWM and Phase Correct PWM are fixed                */
 /*               V03 : Adding ICU Feature to Calculate :                       */
 /*                     [Duty Cycle] in % - [Time ON/OFF] in US                 */
+/*               V04 : Adding New function to get Time On for single Pulse     */
 /*******************************************************************************/
 #ifndef	TIMER1_PRIVATE_H
 #define TIMER1_PRIVATE_H

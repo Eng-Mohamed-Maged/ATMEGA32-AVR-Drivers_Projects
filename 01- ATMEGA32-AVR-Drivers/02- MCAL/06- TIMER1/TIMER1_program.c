@@ -1,11 +1,12 @@
 /*******************************************************************************/
 /*   Author    : Mohamed Maged                                                 */
-/*   Version   : V03                                                           */
-/*   Date      : 8 November 2023                                               */
+/*   Version   : V04                                                           */
+/*   Date      : 11 November 2023                                              */
 /*   Logs      : V01 : Initial creation                                        */
 /*               V02 : Fast PWM and Phase Correct PWM are fixed                */
 /*               V03 : Adding ICU Feature to Calculate :                       */
 /*                     [Duty Cycle] in % - [Time ON/OFF] in US                 */
+/*               V04 : Adding New function to get Time On for single Pulse     */
 /*******************************************************************************/
 /* Library includes */
 #include  "../inc/STD_TYPES.h"
@@ -15,6 +16,10 @@
 #include  "../inc/TIMER1_interface.h"
 #include  "../inc/TIMER1_private.h"
 #include  "../inc/TIMER1_config.h"
+/*******************************************************************************/
+/*                            Prescaler OPTIONS                                */
+/*******************************************************************************/
+u16 Global_Prescaler[6] = {0,1,8,64,256,1024};
 /*******************************************************************************/
 /* CallBack Function for TIMER1  */
 void (*TIMER1_CallBack[4]) () ;
@@ -394,7 +399,7 @@ void M_TIMER1_voidICU_SetEventTrigger(TIMER1_EVENT_t Copy_CaptureEvent)
 /*******************************************************************************/
 /*******************************************************************************/
 
-void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle,u8 * Copy_ptrTimeOn_US,u8 * Copy_ptrTimeOff_US)
+void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle,u32 * Copy_ptrTimeOn_US,u32 * Copy_ptrTimeOff_US)
 {
 
 	TIM1_GLOBAL_FUN = TIMER1_INPUT_CAPTURE_UNIT_FUNCTION;
@@ -476,8 +481,8 @@ void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle,u8 * Copy_ptrTimeOn
     u8 Local_u8DutyCycle = (u8)((Local_u32Time_ON * 100) / Local_u32Period);
 
 
-    *Copy_ptrTimeOn_US  = (Local_u32Time_ON * TIMER1_PRESCALER * 1000000)/SYSTEM_CLOCK_SOURCE ;
-    *Copy_ptrTimeOff_US = ((Local_u32Period - Local_u32Time_ON) * TIMER1_PRESCALER * 1000000)/SYSTEM_CLOCK_SOURCE ;
+    *Copy_ptrTimeOn_US  = (Local_u32Time_ON * Global_Prescaler[TIMER1_PRESCALER] * 1000000)/SYSTEM_CLOCK_SOURCE ;
+    *Copy_ptrTimeOff_US = ((Local_u32Period - Local_u32Time_ON) * Global_Prescaler[TIMER1_PRESCALER] * 1000000)/SYSTEM_CLOCK_SOURCE ;
     *Copy_ptrGetDutyCycle = Local_u8DutyCycle + TIMER1_PWM_ERROR;
 
 
@@ -494,6 +499,77 @@ void M_TIMER1_voidICU_GetDutyCycle(u8 * Copy_ptrGetDutyCycle,u8 * Copy_ptrTimeOn
 	TIM1_GLOBAL_FUN = TIMER1_NO_OPERATION;
 
 }
+
+void M_TIMER1_voidICU_GetTimeOn_us(u32 * Copy_ptrTimeOn_US)
+{
+
+	TIM1_GLOBAL_FUN = TIMER1_INPUT_CAPTURE_UNIT_FUNCTION;
+	#if TIMER1_ICU_NOISE_CANCELER == TIMER1_ICU_NOISE_CANCELER_ENABLE
+		SET_BIT(TIMER1->TCCR1B , 7);
+	#elif TIMER1_ICU_NOISE_CANCELER == TIMER1_ICU_NOISE_CANCELER_DISABLE
+		CLR_BIT(TIMER1->TCCR1B , 7);
+	#endif
+
+	M_TIMER1_voidInterrupt_Enable(TIMER1_OVERFLOW_INTERRUPT);
+	M_TIMER1_voidInterrupt_Enable(TIMER1_EVENT_INTERRUPT);
+
+	/* Clear Input Capture flag by writing 1 */
+	SET_BIT(TIMER1->TIFR,TIMER1_ICF1_BIT);
+
+	/* Enable Rising Edge Trigger */
+	M_TIMER1_voidICU_SetEventTrigger(TIMER1_RAISING_EDGE);
+    TIMER1->TCNT1H = 0; // Clear the counter
+    TIMER1->TCNT1L = 0;
+    Global_u16Number_Of_Overflow_CaptureUnit = 0;
+
+    // Start Timer1
+    M_TIMER1_voidStart();
+
+	// Wait for the first edge to capture [First Reading]
+    while (GET_BIT(TIMER1->TIFR, TIMER1_ICF1_BIT) == 0);
+
+	// Capture the initial count [First Reading]
+    u16 Local_u16StartCaptureValue =  TIMER1->ICR1L_ICR1H;
+
+	/* Enable Falling Edge Trigger */
+	M_TIMER1_voidICU_SetEventTrigger(TIMER1_FALLING_EDGE);
+
+	/* Clear Input Capture flag by writing 1 */
+	SET_BIT(TIMER1->TIFR,TIMER1_ICF1_BIT);
+    // Wait for the next edge to capture  [End Reading]
+	while (GET_BIT(TIMER1->TIFR, TIMER1_ICF1_BIT) == 0);
+
+	// Capture the Final count [End Reading]
+    u16 Local_u16EndCaptureValue =  TIMER1->ICR1L_ICR1H;
+
+    u32 Local_u32Time_ON = 0;
+    /* IF there is no Overflow */
+    if(Global_u16NumberOVF_ICU == 0)
+    {
+       Local_u32Time_ON = Local_u16EndCaptureValue - Local_u16StartCaptureValue;
+    }
+    else
+    {
+    	Local_u32Time_ON = ((u32)(Global_u16NumberOVF_ICU * TIMER1_MAXIMUM_VALUE)) + Local_u16EndCaptureValue- Local_u16StartCaptureValue;
+    }
+
+
+    *Copy_ptrTimeOn_US  = (Local_u32Time_ON * ((Global_Prescaler[TIMER1_PRESCALER] * 1000000)/SYSTEM_CLOCK_SOURCE)) ;
+
+    /* Clear the TCNT1 to calculate number of overflows */
+    TIMER1->TCNT1H = 0; // Clear the counter
+    TIMER1->TCNT1L = 0;
+    Global_u16Number_Of_Overflow_CaptureUnit = 0;
+	/* Clear Input Capture flag by writing 1 */
+	SET_BIT(TIMER1->TIFR,TIMER1_ICF1_BIT);
+	M_TIMER1_voidInterrupt_Disable(TIMER1_OVERFLOW_INTERRUPT);
+	M_TIMER1_voidInterrupt_Disable(TIMER1_EVENT_INTERRUPT);
+
+	M_TIMER1_voidStop();
+	TIM1_GLOBAL_FUN = TIMER1_NO_OPERATION;
+
+}
+
 
 
 /*******************************************************************************/
