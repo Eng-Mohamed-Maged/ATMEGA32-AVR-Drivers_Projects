@@ -13,7 +13,7 @@ The ATMEGA32_AVR microcontroller is widely used microcontroller in embedded syst
 
 # Testing Video
 
-[![IMAGE ALT TEXT HERE]()](https://www.youtube.com/watch?v=GEcKRYfOnUs)
+[![IMAGE ALT TEXT HERE](https://github.com/Eng-Mohamed-Maged/ATMEGA32-AVR-Drivers_Projects/blob/main/02-%20ATMEGA32-AVR-Projects/07-%20NTI_ADC_LM35_AVR_TEST/0.png)](https://www.youtube.com/watch?v=GEcKRYfOnUs)
 
 # Getting Started
 To get started with using these drivers in your ATMEGA32-AVR project, follow these steps:
